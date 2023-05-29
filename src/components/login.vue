@@ -18,15 +18,14 @@
     </div>
 </template>
   
-<script setup>
+<script lang="ts" setup>
 import { reactive } from 'vue'
-import request from '../api/request'
-import { h } from 'vue'
 import { ElMessage } from 'element-plus'
+import users_ from '../store/users'
+import router from '@/router'
+import userapi from '../api/users'
 
-const open = (message) => {
-  ElMessage(message)
-}
+const users=users_()
 
 const form = reactive({
     account: '',
@@ -34,18 +33,15 @@ const form = reactive({
 })
 
 const onSubmit = () => {
-    request.post(`/login`,{
+    userapi.login({
         account:form.account,
         password:form.password
     })
     .then(function (response) {
-        console.log(response.data);
-        if(response.data.status==0){
-            open("登录成功")
-            
-        }else{
-            open(response.data.message)
-        }
+        ElMessage("登录成功")
+        users.setSelf(response.data);
+        router.push('/user')
+
     })
     .catch(function (error) {
         console.log(error);
