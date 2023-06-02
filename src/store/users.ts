@@ -7,7 +7,7 @@ interface UserInfo {
 export const users = defineStore('users', {
   state: () => {
     return {
-      self :null as UserInfo | null,
+      self: null as UserInfo | null,
       others: [] as UserInfo[]
     }
   },
@@ -16,7 +16,14 @@ export const users = defineStore('users', {
     getAccount(state) {
       return state.self.account
     },
-    getOtherAccount: (state) => { (uuid_ : string) => state.others.find((v) => v.uuid == uuid_).account },
+    // getOtherAccount: (state) => { (uuid_ : string) => state.others.find((v) => v.uuid == uuid_).account },
+    searchAccount: (state) => (uuid_: string) => {
+      if (uuid_ == state.self.uuid) {
+        return state.self.account
+      }
+      return state.others.find((v) => v.uuid == uuid_).account
+    }
+
   },
   actions: {
     setSelf(self: UserInfo) {

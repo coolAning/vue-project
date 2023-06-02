@@ -26,7 +26,40 @@ interface TestAPISchema extends APISchema {
         },
         response: {
         },
-    }
+    },
+    getInfo: {
+        request: {
+        },
+        response: {
+            "data": {
+                // "guuid": string,
+                "num": number,
+                "useruuid": string
+            }[],
+            "guuid": string,
+            "next": string,
+        }[],
+    },
+    getConfirm:{
+        request: {
+        },
+        response: {
+        },
+    },
+    addTx:{
+        request: {
+            "guuid": string,
+        },
+        response: {
+        },
+    },
+    confirm:{
+        request: {
+            "txuuid" : string
+        },
+        response: {
+        },
+    },
 }
 export const api = attachAPI<TestAPISchema>(service, {
     login: {
@@ -42,6 +75,26 @@ export const api = attachAPI<TestAPISchema>(service, {
     add:{
         method : 'POST',
         url : '/add',
+        needId : true,
+    },
+    getInfo:{
+        method : 'GET',
+        url : '/getInfo',
+        needId : true,
+    },
+    getConfirm:{
+        method : 'GET',
+        url : '/getConfirm',
+        needId : true,
+    },
+    addTx:{
+        method : 'GET',
+        url : '/addTx',
+        needId : true,
+    },
+    confirm:{
+        method : 'POST',
+        url : '/confirm',
         needId : true,
     },
 });
