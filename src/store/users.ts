@@ -7,7 +7,10 @@ interface UserInfo {
 export const users = defineStore('users', {
   state: () => {
     return {
-      self: null as UserInfo | null,
+      self: {
+        account: '',
+        uuid: ''
+      } as UserInfo | null,
       others: [] as UserInfo[]
     }
   },

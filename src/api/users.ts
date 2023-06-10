@@ -44,7 +44,12 @@ interface TestAPISchema extends APISchema {
         request: {
         },
         response: {
-        },
+            "count": number,
+            "guuid": string,
+            "time": string,
+            "txuuid": string,
+            "useruuid": string
+        }[],
     },
     addTx:{
         request: {
