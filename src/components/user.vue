@@ -11,9 +11,17 @@
 
     <div class="demo-collapse">
         <el-collapse v-model="activeNames" @change="handleChange">
-            <el-collapse-item v-for="(group, index) in panelData" :title="group.guuid" :name="index" :key="index">
-                <div v-for="(user, idx) in group.data" :key="idx">
-                    {{ users.searchAccount(user.useruuid) + " 顺序：" + (user.num + 1) }}
+            <el-collapse-item v-for="(group, index) in panelData" :title="'下一位：' + users.searchAccount(group.next)"
+                :name="index" :key="index">
+                <text v-for="(user, idx) in group.data" :key="idx">
+                    {{ users.searchAccount(user.useruuid) + " " }}
+
+                </text>
+                <div v-if="group.next == users.getUUID">
+                    <el-button :disabled="buttonState[index]" @click="addTx(group.guuid)" >取外卖</el-button>
+                </div>
+                <div v-if="group.next == users.getUUID">
+                    <el-button @click="getConfirmState(group.guuid)">检查</el-button>
                 </div>
             </el-collapse-item>
         </el-collapse>
@@ -52,17 +60,25 @@ const users = users_()
 const groups = groups_()
 
 const id = users.getUUID;
+
+let buttonState=[]
 // 向给定ID的用户发起请求
 const init = async () => {
     await userapi.getUsers({}, id)
         .then(function (response) {
-
+            if (localStorage.getItem('uuid') != null) {
+                users.setSelf({
+                    uuid: localStorage.getItem('uuid'),
+                    account: localStorage.getItem('account')
+                })
+            }
             data.value = response.data.filter(value => value.uuid != users.getUUID).map(value => {
                 return {
                     key: value.uuid,
                     label: value.account
                 }
             })
+
             users.setOthers(response.data)
 
 
@@ -74,7 +90,12 @@ const init = async () => {
 
     await userapi.getInfo({}, id)
         .then(function (response) {
-            panelData.value = response.data
+            response.data.forEach(element => {
+                element.data.sort((a, b) => a.num - b.num)
+            });
+
+            panelData.value = response.data;
+
             let groups_ = []
             for (let i = 0; i < response.data.length; i++) {
                 let uuid = response.data[i].guuid
@@ -84,8 +105,10 @@ const init = async () => {
                 }
                 groups_.push({
                     uuid: uuid,
+                    n_tx: "",
                     users_uuid: users_uuid
                 })
+                buttonState.push(false)
             }
             groups.setGroups(groups_)
 
@@ -127,15 +150,30 @@ const value = ref([])
 
 const submit_confirm = async (row) => {
     console.log(row.radio, row.txuuid);
-    await userapi.confirm({
-        txuuid: row.txuuid,
-    }, id)
-        .then(function (response) {
-            ElMessage("确认成功")
-        })
-        .catch(function (error) {
-            console.log(error);
-        })
+    if (row.radio == 1) {
+        await userapi.confirm({
+            txuuid: row.txuuid,
+        }, id)
+            .then(function (response) {
+                ElMessage("确认成功")
+                init()//刷新
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    } else {
+        await userapi.cancel({
+            txuuid: row.txuuid,
+        }, id)
+            .then(function (response) {
+                ElMessage("拒绝成功")
+                init()//刷新
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+
 
 }
 
@@ -154,7 +192,26 @@ const create = () => {
 
 const panelData = ref([])
 
-
+const addTx = async (g_uuid) => {
+    await userapi.addTx({ guuid: g_uuid }, id)
+        .then(function (response) {
+            ElMessage("取外卖成功")
+            console.log(response.data);
+            groups.setTxByUuid(g_uuid, response.data)
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
+}
+const getConfirmState = async (g_uuid) => {
+    await userapi.getConfirmState({ txuuid: groups.getTxByUuid(g_uuid) }, id)
+        .then(function (response) {
+            ElMessage(response.data.join(" "))
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
+}
 
 
 

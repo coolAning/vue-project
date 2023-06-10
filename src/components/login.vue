@@ -40,8 +40,9 @@ const onSubmit = () => {
     .then(function (response) {
         ElMessage("登录成功")
         users.setSelf(response.data);
+        localStorage.setItem('uuid', response.data.uuid)
+        localStorage.setItem('account', response.data.account)
         router.push('/user')
-
     })
     .catch(function (error) {
         console.log(error);

@@ -55,10 +55,22 @@ interface TestAPISchema extends APISchema {
         request: {
             "guuid": string,
         },
+        response: string,
+    },
+    confirm:{
+        request: {
+            "txuuid" : string
+        },
         response: {
         },
     },
-    confirm:{
+    getConfirmState:{
+        request: {
+            "txuuid" : string
+        },
+        response: string[],
+    },
+    cancel:{
         request: {
             "txuuid" : string
         },
@@ -93,11 +105,21 @@ export const api = attachAPI<TestAPISchema>(service, {
         needId : true,
     },
     addTx:{
-        method : 'GET',
+        method : 'POST',
         url : '/addTx',
         needId : true,
     },
     confirm:{
+        method : 'POST',
+        url : '/confirm',
+        needId : true,
+    },
+    getConfirmState:{
+        method : 'POST',
+        url : '/getConfirmState',
+        needId : true,
+    },
+    cancel:{
         method : 'POST',
         url : '/confirm',
         needId : true,

@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 interface GroupInfo {
   uuid: string,
   users_uuid: string[]
+  n_tx:string
 }
 export const groups = defineStore('groups', {
   state: () => {
@@ -11,22 +12,22 @@ export const groups = defineStore('groups', {
     }
   },
   getters: {
-    // getOtherAccount: (state) => { (uuid_ : string) => state.others.find((v) => v.uuid == uuid_).account },
-    // searchAccount: (state) => (uuid_: string) => {
-    //   if (uuid_ == state.self.uuid) {
-    //     return state.self.account
-    //   }
-    //   return state.others.find((v) => v.uuid == uuid_).account
-    // }
     getGroupUsers_uuid: (state) => (uuid_: string) => {
       return state.groups.find((v) => v.uuid == uuid_).users_uuid
-    }
+    },
+    getTxByUuid: (state) => (uuid_: string) => {
+      return state.groups.find((v) => v.uuid == uuid_).n_tx
+    }, 
 
   },
   actions: {
     setGroups(groups: GroupInfo[]) {
       this.groups = groups
-    }
+    },  
+    setTxByUuid(uuid_: string, n_tx: string) {
+      let index = this.groups.findIndex((v: GroupInfo) => v.uuid == uuid_)
+      this.groups[index].n_tx = n_tx
+    },
   },
 })
 export default groups
