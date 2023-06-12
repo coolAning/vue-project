@@ -37,6 +37,7 @@ interface TestAPISchema extends APISchema {
                 "useruuid": string
             }[],
             "guuid": string,
+            "txuuid"?: string,
             "next": string,
         }[],
     },
