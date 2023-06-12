@@ -36,7 +36,7 @@ export function attachAPI<T extends APISchema>(
 }
 import { ElMessage } from "element-plus";
 export const service = axios.create({
-    baseURL: "http://tro.435qb.top:13456", //"http://139.224.119.118:8085" "http://localhost:8085"
+    baseURL: "https://tro.435qb.top:13456", //"http://139.224.119.118:8085" "http://localhost:8085"
     timeout: 5000,
 })
 
