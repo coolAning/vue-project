@@ -18,7 +18,7 @@
 
                 </text>
                 <div v-if="group.next == users.getUUID">
-                    <el-button :disabled="buttonState[index]" @click="addTx(group.guuid)" >取外卖</el-button>
+                    <el-button :disabled="buttonState[index]" @click="addTx(group.guuid)">取外卖</el-button>
                 </div>
                 <div v-if="group.next == users.getUUID">
                     <el-button @click="getConfirmState(group.guuid)">检查</el-button>
@@ -61,17 +61,17 @@ const groups = groups_()
 
 const id = users.getUUID;
 
-let buttonState=[]
+let buttonState = []
 // 向给定ID的用户发起请求
 const init = async () => {
     await userapi.getUsers({}, id)
         .then(function (response) {
-            if (localStorage.getItem('uuid') != null) {
-                users.setSelf({
-                    uuid: localStorage.getItem('uuid'),
-                    account: localStorage.getItem('account')
-                })
-            }
+            // if (localStorage.getItem('uuid') != null) {
+            //     users.setSelf({
+            //         uuid: localStorage.getItem('uuid'),
+            //         account: localStorage.getItem('account')
+            //     })
+            // }
             data.value = response.data.filter(value => value.uuid != users.getUUID).map(value => {
                 return {
                     key: value.uuid,
@@ -204,13 +204,17 @@ const addTx = async (g_uuid) => {
         })
 }
 const getConfirmState = async (g_uuid) => {
-    await userapi.getConfirmState({ txuuid: groups.getTxByUuid(g_uuid) }, id)
-        .then(function (response) {
-            ElMessage(response.data.join(" "))
-        })
-        .catch(function (error) {
-            console.log(error);
-        })
+    if (groups.getTxByUuid(g_uuid) == "") {
+        ElMessage("请先点击取外卖")
+    } else {
+        await userapi.getConfirmState({ txuuid: groups.getTxByUuid(g_uuid) }, id)
+            .then(function (response) {
+                ElMessage(response.data.join(" "))
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
 }
 
 

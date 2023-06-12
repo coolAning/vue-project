@@ -38,5 +38,8 @@ export const users = defineStore('users', {
       this.others = others
     }
   },
+  persist: {
+    key: 'users',
+  },
 })
 export default users

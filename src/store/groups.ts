@@ -21,8 +21,8 @@ export const groups = defineStore('groups', {
 
   },
   actions: {
-    setGroups(groups: GroupInfo[]) {
-      this.groups = groups
+    setGroups(groups_: GroupInfo[]) {
+      this.groups = groups_
     },  
     setTxByUuid(uuid_: string, n_tx: string) {
       let index = this.groups.findIndex((v: GroupInfo) => v.uuid == uuid_)
