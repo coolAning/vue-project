@@ -122,7 +122,7 @@ export const api = attachAPI<TestAPISchema>(service, {
     },
     cancel:{
         method : 'POST',
-        url : '/confirm',
+        url : '/cancel',
         needId : true,
     },
 });
