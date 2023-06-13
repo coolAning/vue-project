@@ -183,6 +183,7 @@ const create = () => {
     }, id)
         .then(function (response) {
             ElMessage("创建成功")
+            init()//刷新
         })
         .catch(function (error) {
 
@@ -204,7 +205,7 @@ const addTx = async (g_uuid) => {
         })
 }
 const getConfirmState = async (g_uuid) => {
-    if (groups.getTxByUuid(g_uuid) == "") {
+    if (groups.getTxByUuid(g_uuid) == undefined) {
         ElMessage("请先点击取外卖")
     } else {
         await userapi.getConfirmState({ txuuid: groups.getTxByUuid(g_uuid) }, id)
