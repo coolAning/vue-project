@@ -35,12 +35,12 @@
             <el-table-column prop="members" label="members" width="180" />
             <el-table-column prop="account" label="account" width="180" />
             <el-table-column label="Select">
-                <template #default="scope">
-                    <el-radio-group v-model="scope.row.radio">
-                        <el-radio :label="1">同意</el-radio>
-                        <el-radio :label="0">拒绝</el-radio>
+                <template #default="{ item }: { item: row }">
+                    <el-radio-group v-model=" item.row.radio ">
+                        <el-radio :label=" 1 ">同意</el-radio>
+                        <el-radio :label=" 0 ">拒绝</el-radio>
                     </el-radio-group>
-                    <el-button @click="submit_confirm(scope.row)">提交</el-button>
+                    <el-button @click="submit_confirm(item.row)">提交</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -50,18 +50,33 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import users_ from '../store/users'
-import groups_ from '../store/groups'
-import { ElMessage } from 'element-plus'
+import groups_, { GroupInfo } from '../store/groups'
+import { ElMessage, ElTable, ElTableColumn } from 'element-plus'
 import userapi from '../api/users'
+import { test } from "../api/users";
 
-const tableData = ref([]);
+interface row {
+    row: ITableData,
+    column: {},
+    $index: number,
+}
+
+interface ITableData {
+    time: string,
+    members: string,
+    account: string,
+    txuuid: string,
+    radio: number
+}
+
+const tableData = ref<ITableData[]>([]);
 
 const users = users_()
 const groups = groups_()
 
 const id = users.getUUID;
 
-let buttonState = []
+let buttonState = ref<Boolean[]>([])
 // 向给定ID的用户发起请求
 const init = async () => {
     await userapi.getUsers({}, id)
@@ -96,7 +111,7 @@ const init = async () => {
 
             panelData.value = response.data;
 
-            let groups_ = []
+            let groups_: GroupInfo[] = []
             for (let i = 0; i < response.data.length; i++) {
                 let uuid = response.data[i].guuid
                 let users_uuid = []
@@ -108,7 +123,7 @@ const init = async () => {
                     n_tx: response.data[i].txuuid,
                     users_uuid: users_uuid
                 })
-                buttonState.push(false)
+                buttonState.value.push(false)
             }
             groups.setGroups(groups_)
 
@@ -122,10 +137,16 @@ const init = async () => {
         .then(function (response) {
             console.log(response.data);
             tableData.value = response.data.map(value => {
+                let undefined_uuids = groups.getGroupUsers_uuid(value.guuid)
+                let account = users.searchAccount(value.useruuid)
+                if (undefined_uuids === undefined || account === undefined) {
+                    ElMessage('前端的问题。别甩锅给后端')
+                }
+                let uuids = undefined_uuids as string[]
                 return {
                     time: value.time,
-                    members: groups.getGroupUsers_uuid(value.guuid).map(value => users.searchAccount(value)).join(" "),
-                    account: users.searchAccount(value.useruuid),
+                    members: uuids.map(value => users.searchAccount(value)).join(" "),
+                    account: account as string,
                     txuuid: value.txuuid,
                     radio: 1.
                 }
@@ -143,12 +164,15 @@ const handleChange = (val: string[]) => {
 }
 
 
-const data = ref([])
+const data = ref<{
+    key: string,
+    label: string
+}[]>([])
 
 const value = ref([])
 
 
-const submit_confirm = async (row) => {
+const submit_confirm = async (row: ITableData) => {
     console.log(row.radio, row.txuuid);
     if (row.radio == 1) {
         await userapi.confirm({
@@ -191,9 +215,9 @@ const create = () => {
         })
 }
 
-const panelData = ref([])
+const panelData = ref<test['getInfo']>([])
 
-const addTx = async (g_uuid) => {
+const addTx = async (g_uuid: string) => {
     await userapi.addTx({ guuid: g_uuid }, id)
         .then(function (response) {
             ElMessage("取外卖成功")
@@ -204,14 +228,14 @@ const addTx = async (g_uuid) => {
             console.log(error);
         })
 }
-const getConfirmState = async (g_uuid) => {
-    if (groups.getTxByUuid(g_uuid) == undefined) {
+const getConfirmState = async (g_uuid: string) => {
+    if (groups.getTxByUuid(g_uuid) === undefined) {
         ElMessage("请先点击取外卖")
     } else {
-        await userapi.getConfirmState({ txuuid: groups.getTxByUuid(g_uuid) }, id)
+        await userapi.getConfirmState({ txuuid: groups.getTxByUuid(g_uuid) as string }, id)
             .then(function (response) {
-                let mes = response.data.map(value => 
-                     users.searchAccount(value)
+                let mes = response.data.map(value =>
+                    users.searchAccount(value)
                 ).join(" ")
                 ElMessage(mes)
             })

@@ -1,9 +1,9 @@
 // stores/counter.js
 import { defineStore } from 'pinia'
-interface GroupInfo {
+export interface GroupInfo {
   uuid: string,
   users_uuid: string[]
-  n_tx:string
+  n_tx?:string
 }
 export const groups = defineStore('groups', {
   state: () => {
@@ -13,10 +13,12 @@ export const groups = defineStore('groups', {
   },
   getters: {
     getGroupUsers_uuid: (state) => (uuid_: string) => {
-      return state.groups.find((v) => v.uuid == uuid_).users_uuid
+      let data = state.groups.find((v) => v.uuid == uuid_);
+      return (data ?? {}).users_uuid
     },
     getTxByUuid: (state) => (uuid_: string) => {
-      return state.groups.find((v) => v.uuid == uuid_).n_tx
+      let data = state.groups.find((v) => v.uuid == uuid_);
+      return (data ?? {}).n_tx
     }, 
 
   },

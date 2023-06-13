@@ -10,7 +10,7 @@ export const users = defineStore('users', {
       self: {
         account: '',
         uuid: ''
-      } as UserInfo | null,
+      } as UserInfo,
       others: [] as UserInfo[]
     }
   },
@@ -24,7 +24,8 @@ export const users = defineStore('users', {
       if (uuid_ == state.self.uuid) {
         return state.self.account
       }
-      return state.others.find((v) => v.uuid == uuid_).account
+      let a = state.others.find((v) => v.uuid == uuid_)
+      return (a ?? {}).account
     }
 
   },

@@ -126,4 +126,7 @@ export const api = attachAPI<TestAPISchema>(service, {
         needId : true,
     },
 });
+export type test = {
+    [Key in keyof TestAPISchema] : TestAPISchema[Key]['response']
+}
 export default api
