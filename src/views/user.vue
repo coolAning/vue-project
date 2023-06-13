@@ -35,10 +35,10 @@
             <el-table-column prop="members" label="members" width="180" />
             <el-table-column prop="account" label="account" width="180" />
             <el-table-column label="Select">
-                <template #default="{ item }: { item: row }">
-                    <el-radio-group v-model=" item.row.radio ">
-                        <el-radio :label=" 1 ">同意</el-radio>
-                        <el-radio :label=" 0 ">拒绝</el-radio>
+                <template #default="item">
+                    <el-radio-group v-model="item.row.radio">
+                        <el-radio :label="1">同意</el-radio>
+                        <el-radio :label="0">拒绝</el-radio>
                     </el-radio-group>
                     <el-button @click="submit_confirm(item.row)">提交</el-button>
                 </template>
